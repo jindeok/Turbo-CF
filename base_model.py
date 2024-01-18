@@ -6,6 +6,7 @@ import os
 import argparse
 from utils import csr2torch, recall_at_k, ndcg_at_k, normalize_sparse_adjacency_matrix
 
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 current_directory = os.getcwd()
 
 parser = argparse.ArgumentParser()
@@ -32,7 +33,12 @@ np.random.seed(2022)
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    device = args.device
+    # device = args.device
+    # Automatically decide whether to use cuda or cpu: CPU only for amazon dataset
+    if args.dataset == "amazon":
+        device = "cpu"
+    else:
+        device = "cuda"
     if args.verbose:
         print(f"Device: {device}")
     dataset = args.dataset
@@ -73,3 +79,11 @@ if __name__ == "__main__":
     # print(f"alpha: {a}, p: {p} ")
     print(f"Recall@20: {recall_at_k(gt_mat, results, k=20):.4f}")
     print(f"NDCG@20: {ndcg_at_k(gt_mat, results, k=20):.4f}")
+
+    # Log the results as a textfile in experiment_log/ folder
+    with open(f"experiment_log/{dataset}_base_model.txt", "a") as f:
+        # Write the dataset name & configuration
+        f.write(f"[Base model] Dataset: {dataset}\n")
+        f.write(f"alpha: {args.alpha}, p: {args.power}\n")
+        f.write(f"Recall@20: {recall_at_k(gt_mat, results, k=20):.4f}\n")
+        f.write(f"NDCG@20: {ndcg_at_k(gt_mat, results, k=20):.4f}\n")

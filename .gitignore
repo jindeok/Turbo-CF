@@ -1,5 +1,7 @@
 # Other folders
 dataset/
+experiment_log/
+experiment_scripts/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

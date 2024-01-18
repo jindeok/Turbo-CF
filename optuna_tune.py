@@ -6,6 +6,7 @@ import os
 import argparse
 from utils import csr2torch, recall_at_k, ndcg_at_k, normalize_sparse_adjacency_matrix
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 current_directory = os.getcwd()
 
 parser = argparse.ArgumentParser()
@@ -21,7 +22,6 @@ parser.add_argument(
     default=1,
     help="Whether to print the results or not. 1 prints the results, 0 does not.",
 )
-parser.add_argument("--device", type=str, default="cuda", help="cuda or cpu")
 parser.add_argument("--alpha", type=float, default=0.6, help="For normalization of R")
 parser.add_argument("--power", type=float, default=0.7, help="For normalization of P")
 
@@ -32,7 +32,6 @@ np.random.seed(2022)
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    device = args.device
     if args.verbose:
         print(f"Device: {device}")
     dataset = args.dataset
