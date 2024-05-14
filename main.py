@@ -53,9 +53,9 @@ if __name__ == "__main__":
     if args.verbose:
         print(f"number of overall ratings: {n_inters}")
 
-    mceg_norm = normalize_sparse_adjacency_matrix(R_tr.to_dense(), args.alpha)
+    R_norm = normalize_sparse_adjacency_matrix(R_tr.to_dense(), args.alpha)
     R = R_tr.to_dense()
-    P = mceg_norm.T @ mceg_norm
+    P = R_norm.T @ R_norm
     P.data **= args.power
     P = P.to(device=device).float()
     R = R.to(device=device).float()
