@@ -34,7 +34,7 @@ def ndcg_at_k(gt_mat, results, k=10):
 
 
 def calculate_row_correlations(matrix1, matrix2):
-    base_value = 1  # 이거하고 랭크정규화 하는게 성능이 가장 좋네 230905 (0으로놓으면 폭망)
+    base_value = 1  
 
     num_rows = matrix1.shape[0]
     correlations = torch.zeros(num_rows)
@@ -59,64 +59,6 @@ def calculate_row_correlations(matrix1, matrix2):
     return correlations
 
 
-# 정규화
-def corr_normalizer(corr_arr, version=0):
-    # 랭크정규화
-    if version == 0:
-        ranks = np.apply_along_axis(rankdata, axis=1, arr=corr_arr)
-        normalized_corr_arr = (corr_arr.shape[0] - ranks) / (corr_arr.shape[0])
-
-    # Min-Max 정규화
-    elif version == 1:
-        # 각 행의 최솟값과 최댓값을 계산합니다.
-        min_vals = np.min(corr_arr, axis=1, keepdims=True)
-        max_vals = np.max(corr_arr, axis=1, keepdims=True)
-        normalized_corr_arr = (corr_arr - min_vals) / (max_vals - min_vals)
-        normalized_corr_arr[np.isnan(normalized_corr_arr)] = 0
-
-    # 총합정규화
-    # 각 행을 총합으로 나누어 총합이 1이 되도록 정규화합니다.
-    elif version == 2:
-        row_sums = np.sum(corr_arr, axis=1, keepdims=True)
-        normalized_corr_arr = corr_arr / row_sums
-
-    return normalized_corr_arr
-
-
-def compute_dirichlet_energy(R, n_items):
-    # 라플라시안 행렬 계산: L = D - A
-    R = R.to_dense().T
-    A = R @ R.T
-    D = torch.diag(torch.sum(A, dim=1))  # 대각선 차수 행렬
-    L = D - A  # 라플라시안 행렬
-
-    # Dirichlet 에너지 계산: E(X) = sum(x_i^T L x_i)
-    energy = torch.trace(torch.mm(torch.mm(R.t(), L), R))  # trace(X^T L X)
-    return energy / n_items
-
-
-def normalize_sparse_adjacency_matrix_(adj_matrix, alpha):
-    # Calculate rowsum and columnsum using COO format
-    rowsum = torch.sparse.mm(
-        adj_matrix, torch.ones((adj_matrix.shape[1], 1), device=adj_matrix.device)
-    ).squeeze()
-    colsum = torch.sparse.mm(
-        adj_matrix.t(), torch.ones((adj_matrix.shape[0], 1), device=adj_matrix.device)
-    ).squeeze()
-
-    # Calculate d_inv for rows and columns
-    d_inv_rows = torch.pow(rowsum, -alpha)
-    d_inv_rows[d_inv_rows == float("inf")] = 0.0
-    d_mat_rows = torch.diag(d_inv_rows)
-
-    d_inv_cols = torch.pow(colsum, alpha - 1)
-    d_inv_cols[d_inv_cols == float("inf")] = 0.0
-    d_mat_cols = torch.diag(d_inv_cols)
-
-    # Normalize adjacency matrix
-    norm_adj = d_mat_rows.mm(adj_matrix).mm(d_mat_cols)
-    # norm_adj = d_mat_rows @ adj_matrix @ d_mat_cols
-    return norm_adj
 
 
 def csr2torch(csr_matrix):
@@ -141,115 +83,6 @@ def min_max_normalize(tensor):
     normalized = (tensor - min_val) / (max_val - min_val)
     return normalized
 
-
-def inference_3(MCEG, P, ps, cri, n_users, version=0, device="cpu"):
-    MCEG_c = MCEG[n_users * cri : n_users * (cri + 1), :]
-    P = P.to_dense()
-    P_copy = copy.deepcopy(P)
-    # linear
-    if version == 0:
-        P_copy.data **= ps[0]
-        S = MCEG_c @ P_copy
-    # Concave up
-    elif version == 1:
-        P_copy.data **= ps[1]
-        S = MCEG_c @ (2 * P_copy - (P_copy @ P_copy))
-    # Convex
-    elif version == 2:
-        P_copy.data **= ps[2]
-        if device == "cpu":
-            S = MCEG_c @ (expm(0.15 * P_copy))
-        else:
-            S = MCEG_c @ ((P_copy @ P_copy))
-    elif version == 3:
-        P_copy.data **= ps[3]
-        mu = 0.5
-        S = (
-            MCEG_c
-            @ torch.linalg.inv((P_copy + mu * torch.eye(len(P_copy), device=device)))
-            @ P_copy.T
-        )
-    # Convex
-    elif version == 4:
-        P_copy.data **= ps[2]
-        if device == "cpu":
-            S = MCEG_c @ (expm(0.15 * P_copy))
-        else:
-            S = MCEG_c @ (
-                torch.matrix_exp(
-                    0.15 * (P_copy - torch.eye(len(P_copy), device=device))
-                )
-            )
-    return S
-
-
-def inference_4(MCEG, P, ps, cri, n_users, version=0, device="cpu"):
-    MCEG_c = MCEG[n_users * cri : n_users * (cri + 1), :]
-    P = P.to_dense()
-    P_copy = copy.deepcopy(P)
-    # linear
-    if version == 0:
-        P_copy.data **= ps[0]
-        S = MCEG_c @ min_max_normalize(P_copy)
-    # Concave up
-    elif version == 1:
-        P_copy.data **= ps[1]
-        S = MCEG_c @ min_max_normalize(2 * P_copy - (P_copy @ P_copy))
-    # Convex
-    elif version == 2:
-        P_copy.data **= ps[2]
-        if device == "cpu":
-            S = MCEG_c @ (expm(0.15 * P_copy))
-        else:
-            S = MCEG_c @ min_max_normalize(
-                torch.matrix_exp(
-                    0.15 * (P_copy - torch.eye(len(P_copy), device=device))
-                )
-            )
-    elif version == 3:
-        P_copy.data **= ps[3]
-        mu = 0.5
-        S = (
-            MCEG_c
-            @ torch.linalg.inv((P_copy + mu * torch.eye(len(P_copy), device=device)))
-            @ P_copy.T
-        )
-
-    return S
-
-
-def inference_4(MCEG, P, a, b, cri, n_users, version=0, device="cpu"):
-    MCEG_c = MCEG[n_users * cri : n_users * (cri + 1), :]
-    P = P.to_dense()
-    P_2 = P @ P
-
-    P_copy = copy.deepcopy(P)
-    P_2_copy = copy.deepcopy(P_2)
-    P_copy.data **= a
-    P_2_copy.data **= b
-
-    # linear
-    if version == 0:
-        S = MCEG_c @ P_copy
-    # Concave up
-    elif version == 1:
-        S = MCEG_c @ (2 * P_copy - P_2_copy)
-    return S
-
-
-def normalize_sparse_adjacency_matrix_row(adj_matrix, alpha):
-    rowsum = torch.sparse.mm(
-        adj_matrix, torch.ones((adj_matrix.shape[1], 1), device=adj_matrix.device)
-    ).squeeze()
-    indices = (
-        torch.arange(0, rowsum.size(0)).unsqueeze(1).repeat(1, 2).to(adj_matrix.device)
-    )
-    rowsum = torch.pow(rowsum, -1)
-    d_mat_rows = torch.sparse.FloatTensor(
-        indices.t(), rowsum, torch.Size([rowsum.size(0), rowsum.size(0)])
-    ).to(device=adj_matrix.device)
-    norm_adj = d_mat_rows.mm(adj_matrix)
-    return norm_adj
 
 
 def normalize_sparse_adjacency_matrix(adj_matrix, alpha):
@@ -297,67 +130,6 @@ def normalize_sparse_adjacency_matrix(adj_matrix, alpha):
 
     return norm_adj
 
-
-def normalize_sparse_adjacency_matrix_general(adj_matrix, alpha, beta):
-    """
-    Identical to normalize_sparse_adjacency_matrix when 1 - alpha == beta
-    """
-
-    # Calculate rowsum and columnsum using COO format
-    rowsum = torch.sparse.mm(
-        adj_matrix, torch.ones((adj_matrix.shape[1], 1), device=adj_matrix.device)
-    ).squeeze()
-    rowsum = torch.pow(rowsum, -alpha)
-    colsum = torch.sparse.mm(
-        adj_matrix.t(), torch.ones((adj_matrix.shape[0], 1), device=adj_matrix.device)
-    ).squeeze()
-    colsum = torch.pow(colsum, -beta)
-    indices = (
-        torch.arange(0, rowsum.size(0)).unsqueeze(1).repeat(1, 2).to(adj_matrix.device)
-    )
-    d_mat_rows = torch.sparse.FloatTensor(
-        indices.t(), rowsum, torch.Size([rowsum.size(0), rowsum.size(0)])
-    ).to(device=adj_matrix.device)
-    indices = (
-        torch.arange(0, colsum.size(0)).unsqueeze(1).repeat(1, 2).to(adj_matrix.device)
-    )
-    d_mat_cols = torch.sparse.FloatTensor(
-        indices.t(), colsum, torch.Size([colsum.size(0), colsum.size(0)])
-    ).to(device=adj_matrix.device)
-
-    # Normalize adjacency matrix
-    norm_adj = d_mat_rows.mm(adj_matrix).mm(d_mat_cols)
-
-    return norm_adj
-
-
-def graph_construction(R_tr, n_cri, device, version=0):
-    # Single graph w/ overall ratings
-    if version == 0:
-        MCEG = R_tr[0]
-
-    # MC Expansion graph construction (ablation with uniform)
-    elif version == 1:
-        R_tr_dense = []
-        R_tr_dense.append(R_tr[0].to_dense())
-        for i in range(n_cri - 1):
-            R_tr[i + 1] = R_tr[i + 1].to_dense()
-            R_tr_dense.append(R_tr[i + 1])
-        MCEG = torch.hstack(R_tr_dense)
-        MCEG = MCEG.to_sparse_csr()
-
-    # MC Expansion graph construction (ablation with uniform)
-    elif version == 2:
-        R_tr_dense = []
-        R_tr_dense.append(R_tr[0].to_dense())
-        for i in range(n_cri - 1):
-            R_tr[i + 1] = R_tr[i + 1].to_dense()
-            R_tr_dense.append(R_tr[i + 1])
-        MCEG = torch.vstack(R_tr_dense)
-        # MCEG = MCEG.to_sparse_csr()
-        MCEG = MCEG.to_sparse()
-
-    return MCEG.to(device)
 
 
 def freq_filter(s_values, mode=1, alpha=0.9, start=0):
@@ -413,15 +185,6 @@ def get_norm_adj(alpha, adj_mat):
     return norm_adj
 
 
-# Example usage
-# alpha = ...
-# adj_mat = ...
-# norm_adj, d_mat_rows, d_mat_i_inv_cols = get_norm_adj(alpha, adj_mat)
-
-
-# Evaluation functions
-
-
 def top_k(S, k=1, device="cpu"):
     """
     S: scores, numpy array of shape (M, N) where M is the number of source nodes,
@@ -442,17 +205,6 @@ def top_k(S, k=1, device="cpu"):
                 result[idx, elm] = 1
     return result, top
 
-
-def precision_k_(topk, gt, k, device="cpu"):
-    """
-    topk, gt: (UXI) array
-    k: @k measurement
-    """
-    return (
-        np.multiply(topk, gt).sum() / (k * len(gt))
-        if device == "cpu"
-        else torch.mul(topk, gt).sum() / (k * len(gt))
-    )
 
 
 def precision_k(topk, gt, k, device="cpu"):
@@ -477,17 +229,6 @@ def precision_k(topk, gt, k, device="cpu"):
 
     return mean_precision
 
-
-def recall_k_(topk, gt, k, device="cpu"):
-    """
-    topk, gt: (UXI) array
-    k: @k measurement
-    """
-    return (
-        np.multiply(topk, gt).sum() / gt.sum()
-        if device == "cpu"
-        else torch.mul(topk, gt).sum() / gt.sum()
-    )
 
 
 def recall_k(topk, gt, k, device="cpu"):
