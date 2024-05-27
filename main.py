@@ -22,8 +22,8 @@ parser.add_argument(
     default=1,
     help="Whether to print the results or not. 1 prints the results, 0 does not.",
 )
-parser.add_argument("--alpha", type=float, default=0.6, help="For normalization of R")
-parser.add_argument("--power", type=float, default=0.7, help="For normalization of P")
+parser.add_argument("--alpha", type=float, default=0.5, help="For normalization of R")
+parser.add_argument("--power", type=float, default=1, help="For normalization of P")
 
 
 random.seed(2022)
