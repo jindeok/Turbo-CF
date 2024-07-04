@@ -41,7 +41,7 @@ alpha (a): 0.5, power (s): 1.4 filter: 1
 ## Citation
 If this work was helpful for your project, please kindly cite this in your paper
 
-Jin-Duk Park, Yong-Min Shin, and Won-Yong Shin. "Turbo-CF: Matrix Decomposition-Free Graph Filtering for Fast Recommendation." In SIGIR 2024.   
+[ref] Jin-Duk Park, Yong-Min Shin, and Won-Yong Shin. "Turbo-CF: Matrix Decomposition-Free Graph Filtering for Fast Recommendation." In SIGIR 2024.   
 
 @article{park2024turbo,    
   title={Turbo-CF: Matrix Decomposition-Free Graph Filtering for Fast Recommendation},   
