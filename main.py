@@ -24,6 +24,7 @@ parser.add_argument(
 )
 parser.add_argument("--alpha", type=float, default=0.5, help="For normalization of R")
 parser.add_argument("--power", type=float, default=1, help="For normalization of P")
+parser.add_argument("--filter", type=float, default=1, help="1:linear, 2: 2nd-order, 3: Poly.approx of ideal LPF")
 
 
 random.seed(2022)
@@ -61,7 +62,12 @@ if __name__ == "__main__":
     R = R.to(device=device).float()
 
     # Our model
-    results = R @ (P)
+    if args.filter == 1:
+        results = R @ (P)
+    elif args.filter == 2:
+        results = R @ (2*P-P@P)
+    elif args.filter == 3:
+        results = R @ (P + 0.01*(-P@P@P +10*P@P - 29*P))
 
     # Now get the results
     gt_mat = R_ts.to_dense()
