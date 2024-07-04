@@ -1,7 +1,7 @@
 # Turbo-CF
 
 ## Overview
-This repo. is the source code for **Turbo-CF (accepted in SIGIR 2024)**
+This repo is the source code for **Turbo-CF (accepted in SIGIR 2024)**
 
 ## Features
 - **Training-Free**: Operates without the need for model training.
