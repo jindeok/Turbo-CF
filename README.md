@@ -3,6 +3,9 @@
 ## Overview
 This repo is the source code for **Turbo-CF (accepted in SIGIR 2024)**
 
+<img src="figure1.jpg" alt="Turbo-CF Workflow" width="450">
+
+
 ## Features
 - **Training-Free**: Operates without the need for model training.
 - **Polynomial Graph Filters**: Utilizes efficient polynomial filters, makes it possible to easily compute in parallelism via GPU.
