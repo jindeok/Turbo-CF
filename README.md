@@ -27,7 +27,7 @@ example:
 python main.py --dataset gowalla --filter 1
 ```
 
-you can also run our method in jupyter: main.ipynb
+Can also ran our method in jupyter env: main.ipynb
 
 ## Optimal parameters
 We provide optimal parameters for each dataset herein.
