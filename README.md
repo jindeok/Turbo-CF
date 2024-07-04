@@ -7,7 +7,7 @@ This repo is the source code for **Turbo-CF (accepted in SIGIR 2024)**
 - **Training-Free**: Operates without the need for model training.
 - **Polynomial Graph Filters**: Utilizes efficient polynomial filters, makes it possible to easily compute in parallelism via GPU.
 - **High accuracy**: Achieves near SOTA with very fast computation
-- 
+  
 ## Installation
 Clone the repository and install the necessary dependencies:
 ```bash
