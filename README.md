@@ -41,9 +41,9 @@ alpha (a): 0.5, power (s): 1.4 filter: 1
 ## Citation
 If this work was helpful for your project, please kindly cite this in your paper
 
-@article{park2024turbo,
-  title={Turbo-CF: Matrix Decomposition-Free Graph Filtering for Fast Recommendation},
-  author={Park, Jin-Duk and Shin, Yong-Min and Shin, Won-Yong},
-  journal={arXiv preprint arXiv:2404.14243},
+@article{park2024turbo,    
+  title={Turbo-CF: Matrix Decomposition-Free Graph Filtering for Fast Recommendation},   
+  author={Park, Jin-Duk and Shin, Yong-Min and Shin, Won-Yong},   
+  journal={arXiv preprint arXiv:2404.14243},   
   year={2024}
 }
