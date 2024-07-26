@@ -1,7 +1,7 @@
 # Turbo-CF
 
 ## Overview and Features
-This repo is the source code for **Turbo-CF (accepted in SIGIR 2024)**
+This repo is the source code for **Turbo-CF (SIGIR 2024)**
 
 <img src="figure1.jpg" alt="Turbo-CF Workflow" width="450">
  
@@ -46,9 +46,10 @@ If this work was helpful for your project, please kindly cite this in your paper
 
 [ref] Jin-Duk Park, Yong-Min Shin, and Won-Yong Shin. "Turbo-CF: Matrix Decomposition-Free Graph Filtering for Fast Recommendation." In SIGIR 2024.   
 
-@article{park2024turbo,    
-  title={Turbo-CF: Matrix Decomposition-Free Graph Filtering for Fast Recommendation},   
-  author={Park, Jin-Duk and Shin, Yong-Min and Shin, Won-Yong},   
-  journal={arXiv preprint arXiv:2404.14243},   
+@inproceedings{park2024turbo,
+  title={Turbo-cf: Matrix decomposition-free graph filtering for fast recommendation},
+  author={Park, Jin-Duk and Shin, Yong-Min and Shin, Won-Yong},
+  booktitle={Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  pages={2672--2676},
   year={2024}
 }
