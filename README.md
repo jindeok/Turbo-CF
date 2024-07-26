@@ -18,7 +18,7 @@ pip install -r requirements.txt
 ```
 
 ## Running
-To run the Turbo-CF algorithm, use the provided script (dataset:'gowalla', 'yelp', 'amazon':
+To run the Turbo-CF (dataset:'gowalla', 'yelp', 'amazon'):
 
 ```bash
 python main.py --dataset [dataset_name] --filter [filter_type] --alpha [alpha] --power [power]
