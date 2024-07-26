@@ -40,6 +40,7 @@ alpha (a): 0.6, power (s): 1 filter: 2
 - Amazon-book
 alpha (a): 0.5, power (s): 1.4 filter: 1
 
+(We note that as Turbo-CF is a rule-based method, we use all available dataset (training + validation) for the graph filtering (inference).)
 
 ## Citation
 If this work was helpful for your project, please kindly cite this in your paper
