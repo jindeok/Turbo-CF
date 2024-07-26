@@ -46,10 +46,10 @@ If this work was helpful for your project, please kindly cite this in your paper
 
 [ref] Jin-Duk Park, Yong-Min Shin, and Won-Yong Shin. "Turbo-CF: Matrix Decomposition-Free Graph Filtering for Fast Recommendation." In SIGIR 2024.   
 
-@inproceedings{park2024turbo,
-  title={Turbo-cf: Matrix decomposition-free graph filtering for fast recommendation},
-  author={Park, Jin-Duk and Shin, Yong-Min and Shin, Won-Yong},
-  booktitle={Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval},
-  pages={2672--2676},
-  year={2024}
-}
+@inproceedings{park2024turbo,  
+  title={Turbo-cf: Matrix decomposition-free graph filtering for fast recommendation},  
+  author={Park, Jin-Duk and Shin, Yong-Min and Shin, Won-Yong},  
+  booktitle={Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval},  
+  pages={2672--2676},  
+  year={2024}  
+} 
