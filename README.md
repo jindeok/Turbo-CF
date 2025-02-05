@@ -31,7 +31,7 @@ python main.py --dataset gowalla --filter 1
 Can also be run in jupyter env: main.ipynb
 
 ## Optimal parameters
-We provide optimal parameters for each dataset herein.
+We provide the optimal parameters for each dataset herein.
 
 - Gowalla
 alpha (a): 0.6, power (s): 0.7 filter: 1
